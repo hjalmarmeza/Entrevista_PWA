@@ -115,11 +115,15 @@ export default function App() {
       if (file.type === 'application/pdf') {
         const arrayBuffer = await file.arrayBuffer();
         const data = new Uint8Array(arrayBuffer);
-        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        const loadingTask = pdfjsLib.getDocument({ data });
+        const pdf = await loadingTask.promise;
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          text += content.items.map((item: any) => item.str).join(' ') + '\\n';
+          if (content && content.items) {
+            const items = Array.isArray(content.items) ? content.items : Array.from(content.items as any);
+            text += items.map((item: any) => item.str || '').join(' ') + '\\n';
+          }
         }
       } else if (file.name.endsWith('.docx')) {
         const arrayBuffer = await file.arrayBuffer();
