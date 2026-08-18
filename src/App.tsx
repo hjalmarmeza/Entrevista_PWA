@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 // Tipos para Web Speech API
 declare global {
@@ -15,8 +19,10 @@ export default function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('hp_apiKey') || '');
   const [model, setModel] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
   const [cv, setCv] = useState(localStorage.getItem('hp_cv') || '');
+  const [coverLetter, setCoverLetter] = useState(localStorage.getItem('hp_coverLetter') || '');
   const [job, setJob] = useState(localStorage.getItem('hp_job') || '');
   const [format, setFormat] = useState<Format>((localStorage.getItem('hp_format') as Format) || 'bullets');
+  const [isUploading, setIsUploading] = useState(false);
 
   // Estado de entrevista
   const [isListening, setIsListening] = useState(false);
@@ -98,10 +104,48 @@ export default function App() {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, target: 'cv' | 'coverLetter') => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+
+    try {
+      let text = '';
+      if (file.type === 'application/pdf') {
+        const arrayBuffer = await file.arrayBuffer();
+        const data = new Uint8Array(arrayBuffer);
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map((item: any) => item.str).join(' ') + '\\n';
+        }
+      } else if (file.name.endsWith('.docx')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        text = result.value;
+      } else {
+        // Fallback for txt or other readable files
+        text = await file.text();
+      }
+
+      if (target === 'cv') setCv(text);
+      else setCoverLetter(text);
+    } catch (err) {
+      console.error('Error al procesar el archivo', err);
+      alert('Hubo un error al extraer el texto del archivo.');
+    } finally {
+      setIsUploading(false);
+      // Resetear el input file para que permita seleccionar el mismo de nuevo si se requiere
+      event.target.value = '';
+    }
+  };
+
   const handleSaveConfig = () => {
     localStorage.setItem('hp_apiKey', apiKey);
     localStorage.setItem('hp_model', model);
     localStorage.setItem('hp_cv', cv);
+    localStorage.setItem('hp_coverLetter', coverLetter);
     localStorage.setItem('hp_job', job);
     localStorage.setItem('hp_format', format);
     setIsConfigured(true);
@@ -143,12 +187,13 @@ export default function App() {
     - La redacción debe ser HUMANA, REALISTA, AUTÉNTICA Y SOBRIA.
     - Usa un lenguaje persuasivo, profesional y adecuado al nivel del puesto.
     - Evita clichés, saludos iniciales, o introducciones innecesarias (ve directo al grano).
-    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV proporcionado. Está totalmente prohibido inventar funciones, métricas o habilidades que no estén en el CV.
+    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV y Carta de Presentación. Está totalmente prohibido inventar funciones, métricas o habilidades.
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
     ${cv}
     
+    ${coverLetter ? `CARTA DE PRESENTACIÓN DEL CANDIDATO:\n${coverLetter}\n` : ''}
     PUESTO APLICADO: ${job}
     
     FORMATO DE RESPUESTA REQUERIDO: 
@@ -280,12 +325,34 @@ export default function App() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Tu CV / Experiencia</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-400">Tu CV / Experiencia</label>
+                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
+                  {isUploading ? 'Procesando...' : 'Subir archivo (PDF/Docx)'}
+                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'cv')} disabled={isUploading} />
+                </label>
+              </div>
               <textarea 
                 value={cv}
                 onChange={e => setCv(e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-32 resize-none"
-                placeholder="Pega tu CV aquí..."
+                placeholder="Pega tu CV aquí o sube un archivo..."
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-400">Carta de Presentación (Opcional)</label>
+                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
+                  {isUploading ? 'Procesando...' : 'Subir archivo'}
+                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'coverLetter')} disabled={isUploading} />
+                </label>
+              </div>
+              <textarea 
+                value={coverLetter}
+                onChange={e => setCoverLetter(e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
+                placeholder="Pega tu carta de presentación..."
               />
             </div>
 
