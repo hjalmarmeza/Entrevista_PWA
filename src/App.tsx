@@ -17,6 +17,7 @@ export default function App() {
   const [model, setModel] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
   const [cv, setCv] = useState(localStorage.getItem('hp_cv') || '');
   const [coverLetter, setCoverLetter] = useState(localStorage.getItem('hp_coverLetter') || '');
+  const [aptitudes, setAptitudes] = useState(localStorage.getItem('hp_aptitudes') || '');
   const [job, setJob] = useState(localStorage.getItem('hp_job') || '');
   const [format, setFormat] = useState<Format>((localStorage.getItem('hp_format') as Format) || 'bullets');
   const [isUploading, setIsUploading] = useState(false);
@@ -101,7 +102,7 @@ export default function App() {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, target: 'cv' | 'coverLetter') => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, target: 'cv' | 'coverLetter' | 'aptitudes') => {
     const file = event.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
@@ -153,7 +154,8 @@ export default function App() {
       }
 
       if (target === 'cv') setCv(text);
-      else setCoverLetter(text);
+      else if (target === 'coverLetter') setCoverLetter(text);
+      else setAptitudes(text);
     } catch (err) {
       console.error('Error al procesar el archivo', err);
       alert('Hubo un error al extraer el texto del archivo.');
@@ -169,6 +171,7 @@ export default function App() {
     localStorage.setItem('hp_model', model);
     localStorage.setItem('hp_cv', cv);
     localStorage.setItem('hp_coverLetter', coverLetter);
+    localStorage.setItem('hp_aptitudes', aptitudes);
     localStorage.setItem('hp_job', job);
     localStorage.setItem('hp_format', format);
     setIsConfigured(true);
@@ -210,13 +213,15 @@ export default function App() {
     - La redacción debe ser HUMANA, REALISTA, AUTÉNTICA Y SOBRIA.
     - Usa un lenguaje persuasivo, profesional y adecuado al nivel del puesto.
     - Evita clichés, saludos iniciales, o introducciones innecesarias (ve directo al grano).
-    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV y Carta de Presentación. Está totalmente prohibido inventar funciones, métricas o habilidades.
+    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. Está totalmente prohibido inventar experiencia laboral, métricas o funciones.
+    - REGLA DE INFERENCIA: Si el reclutador te pregunta por tus fortalezas y/o debilidades, infiérelas de manera estratégica, profesional y autocrítica a partir del nivel de experiencia de tu perfil, mostrando áreas de oportunidad de aprendizaje que no te dejen mal parado, siempre respetando la regla de no alucinar experiencia falsa.
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
     ${cv}
     
     ${coverLetter ? `CARTA DE PRESENTACIÓN DEL CANDIDATO:\n${coverLetter}\n` : ''}
+    ${aptitudes ? `COMPETENCIAS Y APTITUDES CLAVE:\n${aptitudes}\n` : ''}
     PUESTO APLICADO: ${job}
     
     FORMATO DE RESPUESTA REQUERIDO: 
@@ -376,6 +381,22 @@ export default function App() {
                 onChange={e => setCoverLetter(e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
                 placeholder="Pega tu carta de presentación..."
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-sm font-medium text-gray-400">Aptitudes y Competencias (Opcional)</label>
+                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
+                  {isUploading ? 'Procesando...' : 'Subir archivo'}
+                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'aptitudes')} disabled={isUploading} />
+                </label>
+              </div>
+              <textarea 
+                value={aptitudes}
+                onChange={e => setAptitudes(e.target.value)}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
+                placeholder="Pega tu lista de aptitudes y competencias clave..."
               />
             </div>
 
