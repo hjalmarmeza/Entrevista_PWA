@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import mammoth from 'mammoth';
-
-import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 // Tipos para Web Speech API
 declare global {
@@ -113,6 +109,20 @@ export default function App() {
     try {
       let text = '';
       if (file.type === 'application/pdf') {
+        // Cargar dinámicamente PDF.js puro desde CDN para evitar errores de Rollup/Vite en Safari
+        if (!(window as any).pdfjsLib) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('No se pudo cargar PDF.js'));
+            document.head.appendChild(script);
+          });
+          const pdfjsLib = (window as any).pdfjsLib;
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+
+        const pdfjsLib = (window as any).pdfjsLib;
         const arrayBuffer = await file.arrayBuffer();
         const data = new Uint8Array(arrayBuffer);
         const loadingTask = pdfjsLib.getDocument({ data });
@@ -125,8 +135,8 @@ export default function App() {
           if (content && content.items) {
             const itemsLength = content.items.length || 0;
             for (let j = 0; j < itemsLength; j++) {
-              const item = content.items[j] as any;
-              if (item && item.str) {
+              const item = content.items[j];
+              if (item && typeof item.str === 'string') {
                 text += item.str + ' ';
               }
             }
