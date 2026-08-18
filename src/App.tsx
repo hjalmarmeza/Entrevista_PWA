@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import mammoth from 'mammoth';
 
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs?url';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 // Tipos para Web Speech API
@@ -117,12 +117,20 @@ export default function App() {
         const data = new Uint8Array(arrayBuffer);
         const loadingTask = pdfjsLib.getDocument({ data });
         const pdf = await loadingTask.promise;
-        for (let i = 1; i <= pdf.numPages; i++) {
+        const totalPages = pdf.numPages || 0;
+        
+        for (let i = 1; i <= totalPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
           if (content && content.items) {
-            const items = Array.isArray(content.items) ? content.items : Array.from(content.items as any);
-            text += items.map((item: any) => item.str || '').join(' ') + '\\n';
+            const itemsLength = content.items.length || 0;
+            for (let j = 0; j < itemsLength; j++) {
+              const item = content.items[j] as any;
+              if (item && item.str) {
+                text += item.str + ' ';
+              }
+            }
+            text += '\\n';
           }
         }
       } else if (file.name.endsWith('.docx')) {
