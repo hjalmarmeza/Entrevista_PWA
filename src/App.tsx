@@ -214,7 +214,7 @@ export default function App() {
     - Usa un lenguaje persuasivo, profesional y adecuado al nivel del puesto.
     - Evita clichés, saludos iniciales, o introducciones innecesarias (ve directo al grano).
     - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. Está totalmente prohibido inventar experiencia laboral, métricas o funciones.
-    - REGLA DE INFERENCIA: Si el reclutador te pregunta por tus fortalezas y/o debilidades, infiérelas de manera estratégica, profesional y autocrítica a partir del nivel de experiencia de tu perfil, mostrando áreas de oportunidad de aprendizaje que no te dejen mal parado, siempre respetando la regla de no alucinar experiencia falsa.
+    - REGLA DE INFERENCIA: Si te preguntan por fortalezas, debilidades o aptitudes, infiérelas a partir del perfil y de la lista proporcionada. ¡ATENCIÓN! No confundas "Aptitudes" (habilidades, conocimientos técnicos y competencias) con "Actitudes" (comportamiento). Si te preguntan por aptitudes, menciona estrictamente las habilidades de tu lista.
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
