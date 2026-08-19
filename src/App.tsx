@@ -28,7 +28,6 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<number>(0);
 
@@ -99,12 +98,7 @@ export default function App() {
     }
   }, [cv, job, format, apiKey, model]); // Dependencias para que closure tenga los datos actuales
 
-  // Desplazamiento automático al generar texto
-  useEffect(() => {
-    if (bottomRef.current && !isAutoScrolling) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [answer, transcript, isAutoScrolling]);
+  // Eliminado el auto-scroll al fondo (bottomRef) porque arruinaba la lectura de teleprompter
 
   const requestWakeLock = async () => {
     if ('wakeLock' in navigator) {
@@ -161,6 +155,11 @@ export default function App() {
   const handleGenerateAnswer = async (question: string) => {
     setIsProcessing(true);
     setAnswer('');
+    setIsAutoScrolling(false); // Turn off auto-scroll when a new question starts
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+    
     
     const systemPrompt = `Actúa como el candidato en una entrevista de trabajo. Eres un profesional experimentado.
     Tu único objetivo es escribir el GUION EXACTO (palabra por palabra) que el candidato leerá en voz alta para responder la pregunta en menos de 60 segundos.
@@ -411,7 +410,6 @@ export default function App() {
             {answer}
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Controles y Temporizadores fijos abajo */}
