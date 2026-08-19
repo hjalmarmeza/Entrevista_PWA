@@ -43,7 +43,7 @@ export default function App() {
 
   // Lógica de Auto-Scroll
   useEffect(() => {
-    if (isAutoScrolling && answer) {
+    if ((isAutoScrolling || timerPhase === 'record') && answer) {
       const scrollStep = () => {
         if (containerRef.current) {
           // Incrementa el scroll. 0.5px por frame = ~30px por segundo = ~1 línea por segundo
@@ -57,7 +57,7 @@ export default function App() {
     return () => {
       if (scrollRef.current) cancelAnimationFrame(scrollRef.current);
     };
-  }, [isAutoScrolling, answer]);
+  }, [isAutoScrolling, timerPhase, answer]);
 
   // Inicializar Speech Recognition
   useEffect(() => {
