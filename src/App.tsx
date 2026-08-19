@@ -14,7 +14,7 @@ type Format = 'bullets' | 'full';
 export default function App() {
   const [isConfigured, setIsConfigured] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('hp_apiKey') || '');
-  const [model] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
+  const [model] = useState('meta-llama/Llama-3.3-70B-Instruct-Turbo');
   const [cv] = useState(localStorage.getItem('hp_cv') || defaultCV);
   const [coverLetter] = useState(localStorage.getItem('hp_coverLetter') || defaultCoverLetter);
   const [aptitudes] = useState(localStorage.getItem('hp_aptitudes') || defaultAptitudes);
@@ -125,7 +125,6 @@ export default function App() {
 
   const handleSaveConfig = () => {
     localStorage.setItem('hp_apiKey', apiKey);
-    localStorage.setItem('hp_model', model);
     localStorage.setItem('hp_cv', cv);
     localStorage.setItem('hp_coverLetter', coverLetter);
     localStorage.setItem('hp_aptitudes', aptitudes);
