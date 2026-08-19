@@ -30,6 +30,7 @@ export default function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<number>(0);
+  const finalTranscriptRef = useRef<string>('');
 
   // Temporizadores
   const [timerPhase, setTimerPhase] = useState<'none' | 'prep' | 'record'>('none');
@@ -68,19 +69,17 @@ export default function App() {
       recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'es-ES'; // Podría ser configurable
 
-      let finalTranscript = '';
-
       recognitionRef.current.onresult = (event: any) => {
         let interimTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const trans = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += trans + ' ';
+            finalTranscriptRef.current += trans + ' ';
           } else {
             interimTranscript += trans;
           }
         }
-        setTranscript(finalTranscript + interimTranscript);
+        setTranscript(finalTranscriptRef.current + interimTranscript);
       };
 
       recognitionRef.current.onerror = (event: any) => {
@@ -91,8 +90,8 @@ export default function App() {
       recognitionRef.current.onend = () => {
         setIsListening(false);
         // Cuando termina de escuchar (por silencio manual o stop)
-        if (finalTranscript.trim() !== '') {
-          handleGenerateAnswer(finalTranscript);
+        if (finalTranscriptRef.current.trim() !== '') {
+          handleGenerateAnswer(finalTranscriptRef.current);
         }
       };
     }
@@ -136,6 +135,7 @@ export default function App() {
   const startListening = () => {
     setTranscript('');
     setAnswer('');
+    finalTranscriptRef.current = '';
     setShowTimers(false);
     setTimerPhase('none');
     clearInterval(timerIntervalRef.current!);
