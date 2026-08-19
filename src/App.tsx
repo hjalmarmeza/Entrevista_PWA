@@ -145,11 +145,11 @@ export default function App() {
     Tu único objetivo es escribir el GUION EXACTO (palabra por palabra) que el candidato leerá en voz alta para responder la pregunta en menos de 60 segundos.
     
     TONO Y ESTILO (ESTRICTAMENTE CONVERSACIONAL Y HUMANO):
-    - VÉ DIRECTO AL GRANO DESDE LA PRIMERA PALABRA. ESTÁ TOTALMENTE PROHIBIDO usar introducciones de relleno como "En mi experiencia como...", "A lo largo de mi carrera...", o "Me considero una persona...".
-    - ESTÁ TOTALMENTE PROHIBIDO usar conclusiones robóticas como "En resumen,", "En conclusión,", o "Para finalizar".
-    - PROHIBIDO hablar como una Inteligencia Artificial. PROHIBIDO usar frases como "Algunas de mis aptitudes incluyen:" o usar lenguaje estructurado y acartonado.
-    - PROHIBIDO usar negritas (**texto**) o formatos markdown de enciclopedia. 
-    - Escribe exactamente como hablaría un humano experimentado en una entrevista real: fluido, natural y persuasivo. Si te preguntan por habilidades, menciónalas como parte de tus logros y experiencia viva.
+    - LENGUAJE FRESCO Y NATURAL: Habla de tú a tú. No uses palabras excesivamente técnicas, corporativas o formales. No estás leyendo un CV, estás charlando en una entrevista.
+    - SIMULA ESPONTANEIDAD: El entrevistador NUNCA debe notar que esto lo escribió una IA. Usa conectores propios del habla real ("bueno", "la verdad es que", "yo te diría que", "fíjate que", "para mí").
+    - VÉ DIRECTO AL GRANO DESDE LA PRIMERA PALABRA: PROHIBIDO usar introducciones de relleno como "En mi experiencia como...", o conclusiones como "En resumen,".
+    - PROHIBIDO hablar como un robot o hacer listados estructurados. Nada de "Algunas de mis aptitudes incluyen:" ni usar negritas o markdown.
+    - Tu objetivo es sonar como un humano relajado, confiado, y que responde de memoria, NO como alguien leyendo un libreto o un diccionario.
     - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. 
     - REGLA DE INFERENCIA DE HABILIDADES: Si te preguntan por fortalezas o aptitudes, menciónalas a partir de la lista. IMPORTANTE: TIENES ESTRICTAMENTE PROHIBIDO USAR LA PALABRA "ACTITUDES". NUNCA digas "actitudes". Usa siempre la palabra "aptitudes", "habilidades" o "competencias".
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
