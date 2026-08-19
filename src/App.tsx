@@ -190,6 +190,10 @@ export default function App() {
     - MÁXIMO 3 PÁRRAFOS BREVES. Recuerda que el candidato tiene que leer esto en menos de 60 segundos.
     - PROHIBIDO repetir la premisa de la pregunta (ej. no digas "En la situación que describes de un sábado por la mañana..."). Ve directo a la acción: "Lo primero que haría sería...".
 
+    REGLAS DE VOCABULARIO Y CAMBIO DE SECTOR (CRÍTICO):
+    - PALABRAS PROHIBIDAS: Tienes ESTRICTAMENTE PROHIBIDO usar la palabra "transferibles" (suena a Inteligencia Artificial). Tienes ESTRICTAMENTE PROHIBIDO usar la palabra "actitudes" (usa siempre "aptitudes" o "habilidades").
+    - MINIMIZA TU SECTOR PASADO: Si te preguntan por tu cambio de "Telecomunicaciones" a un Supermercado, NO repitas la palabra "telecomunicaciones" múltiples veces. Menciónalo UNA sola vez de pasada para no llamar la atención sobre tu falta de experiencia en retail. Enfoca el 90% de tu respuesta en tu pasión actual por la dinámica de tienda, los clientes y la eficiencia operativa.
+
     TONO Y ESTILO (ESTRICTAMENTE CONVERSACIONAL Y HUMANO):
     - LENGUAJE FRESCO Y NATURAL: Habla de tú a tú. No uses palabras excesivamente técnicas, corporativas o formales. No estás leyendo un CV, estás charlando en una entrevista.
     - SIMULA ESPONTANEIDAD: El entrevistador NUNCA debe notar que esto lo escribió una IA. Usa conectores propios del habla real ("bueno", "la verdad es que", "yo te diría que", "fíjate que", "para mí").
@@ -197,7 +201,6 @@ export default function App() {
     - PROHIBIDO ENUMERAR Y HACER LISTAS: Si te preguntan por fortalezas y debilidades, ESTÁ ESTRICTAMENTE PROHIBIDO decir "Mi primera fortaleza es...", "Uno:...", o usar viñetas. Teje la respuesta en una sola historia natural, conversacional y fluida. Nada de "Algunas de mis aptitudes incluyen:" ni usar negritas o markdown.
     - Tu objetivo es sonar como un humano relajado, confiado, y que responde de memoria, NO como alguien leyendo un libreto o un diccionario.
     - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. 
-    - REGLA DE INFERENCIA DE HABILIDADES: Si te preguntan por fortalezas o aptitudes, menciónalas a partir de la lista. IMPORTANTE: TIENES ESTRICTAMENTE PROHIBIDO USAR LA PALABRA "ACTITUDES". NUNCA digas "actitudes". Usa siempre la palabra "aptitudes", "habilidades" o "competencias".
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
