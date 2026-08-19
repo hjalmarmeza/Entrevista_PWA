@@ -229,6 +229,7 @@ export default function App() {
       }
 
       setIsProcessing(false);
+      startTimers(); // Inicia los 15s tan pronto empieza a llegar la respuesta
       
       const reader = response.body?.getReader();
       const decoder = new TextDecoder('utf-8');
@@ -243,7 +244,6 @@ export default function App() {
           
           for (const line of lines) {
             if (line.replace(/^data: /, '') === '[DONE]') {
-              startTimers();
               return;
             }
             try {
@@ -256,7 +256,6 @@ export default function App() {
             }
           }
         }
-        startTimers();
       }
     } catch (error) {
       console.error(error);
