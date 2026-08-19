@@ -14,7 +14,7 @@ type Format = 'bullets' | 'full';
 export default function App() {
   const [isConfigured, setIsConfigured] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('hp_apiKey') || '');
-  const [model, setModel] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
+  const [model] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
   const [cv] = useState(localStorage.getItem('hp_cv') || defaultCV);
   const [coverLetter] = useState(localStorage.getItem('hp_coverLetter') || defaultCoverLetter);
   const [aptitudes] = useState(localStorage.getItem('hp_aptitudes') || defaultAptitudes);
@@ -278,21 +278,11 @@ export default function App() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Modelo de DeepInfra</label>
-              <input 
-                type="text" 
-                value={model}
-                onChange={e => setModel(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-400 mb-1">Descripción del Puesto</label>
               <textarea 
                 value={job}
                 onChange={e => setJob(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-32 resize-none"
                 placeholder="Pega la oferta de trabajo aquí..."
               />
             </div>
@@ -317,10 +307,26 @@ export default function App() {
 
             <button 
               onClick={handleSaveConfig}
-              disabled={!apiKey || !cv || !job}
+              disabled={!apiKey || !job}
               className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold text-lg shadow-lg disabled:opacity-50 transition-all active:scale-95"
             >
               Iniciar Entrevista
+            </button>
+            
+            <button 
+              onClick={() => {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(regs => {
+                    regs.forEach(r => r.unregister());
+                    window.location.reload();
+                  });
+                } else {
+                  window.location.reload();
+                }
+              }}
+              className="w-full text-center text-xs text-gray-500 hover:text-gray-300 pt-2"
+            >
+              ¿Ves errores o la pantalla negra? Clic aquí para actualizar
             </button>
           </div>
         </div>
