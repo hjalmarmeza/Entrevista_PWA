@@ -143,9 +143,8 @@ export default function App() {
     setTranscript('');
     setAnswer('');
     finalTranscriptRef.current = '';
-    setShowTimers(false);
-    setTimerPhase('none');
     clearInterval(timerIntervalRef.current!);
+    startTimers(); // EL USUARIO MANDÓ QUE EMPIECE EXACTAMENTE AL PRESIONAR EL BOTÓN
     if (recognitionRef.current) {
       recognitionRef.current.start();
       setIsListening(true);
@@ -250,7 +249,6 @@ export default function App() {
           
           for (const line of lines) {
             if (line.replace(/^data: /, '') === '[DONE]') {
-              startTimers();
               return;
             }
             try {
@@ -263,7 +261,6 @@ export default function App() {
             }
           }
         }
-        startTimers();
       }
     } catch (error) {
       console.error(error);
@@ -272,7 +269,7 @@ export default function App() {
     }
   };
 
-  const startTimers = () => {
+  function startTimers() {
     setShowTimers(true);
     setPrepTime(15);
     setRecordTime(60);
