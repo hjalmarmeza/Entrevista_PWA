@@ -30,6 +30,7 @@ export default function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<number>(0);
+  const exactScrollRef = useRef<number>(0);
   const finalTranscriptRef = useRef<string>('');
 
   // Temporizadores
@@ -45,10 +46,16 @@ export default function App() {
   // Lógica de Auto-Scroll
   useEffect(() => {
     if ((isAutoScrolling || timerPhase === 'record') && answer) {
+      // Sincronizar el scroll exacto con la posición actual (por si el usuario movió el dedo)
+      if (containerRef.current) {
+        exactScrollRef.current = containerRef.current.scrollTop;
+      }
+
       const scrollStep = () => {
         if (containerRef.current) {
-          // Incrementa el scroll. 0.5px por frame = ~30px por segundo = ~1 línea por segundo
-          containerRef.current.scrollTop += 0.5;
+          // Usamos una variable separada porque scrollTop trunca los decimales a 0 en muchos navegadores
+          exactScrollRef.current += 0.5;
+          containerRef.current.scrollTop = exactScrollRef.current;
         }
         scrollRef.current = requestAnimationFrame(scrollStep);
       };
@@ -229,7 +236,6 @@ export default function App() {
       }
 
       setIsProcessing(false);
-      startTimers(); // Inicia los 15s tan pronto empieza a llegar la respuesta
       
       const reader = response.body?.getReader();
       const decoder = new TextDecoder('utf-8');
@@ -244,6 +250,7 @@ export default function App() {
           
           for (const line of lines) {
             if (line.replace(/^data: /, '') === '[DONE]') {
+              startTimers();
               return;
             }
             try {
@@ -256,6 +263,7 @@ export default function App() {
             }
           }
         }
+        startTimers();
       }
     } catch (error) {
       console.error(error);
