@@ -142,14 +142,14 @@ export default function App() {
     setAnswer('');
     
     const systemPrompt = `Actúa como el candidato en una entrevista de trabajo. Eres un profesional experimentado.
-    Genera una respuesta en primera persona que se pueda leer en voz alta de manera fluida y persuasiva en menos de 60 segundos.
+    Tu único objetivo es escribir el GUION EXACTO (palabra por palabra) que el candidato leerá en voz alta para responder la pregunta en menos de 60 segundos.
     
-    TONO Y ESTILO (Basado en el estándar cualitativo de CVPortatil-AI):
-    - La redacción debe ser HUMANA, REALISTA, AUTÉNTICA Y SOBRIA.
-    - Usa un lenguaje persuasivo, profesional y adecuado al nivel del puesto.
-    - Evita clichés, saludos iniciales, o introducciones innecesarias (ve directo al grano).
-    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. Está totalmente prohibido inventar experiencia laboral, métricas o funciones.
-    - REGLA DE INFERENCIA: Si te preguntan por fortalezas, debilidades o aptitudes, infiérelas a partir del perfil y de la lista proporcionada. ¡ATENCIÓN! No confundas "Aptitudes" (habilidades, conocimientos técnicos y competencias) con "Actitudes" (comportamiento). Si te preguntan por aptitudes, menciona estrictamente las habilidades de tu lista.
+    TONO Y ESTILO (ESTRICTAMENTE CONVERSACIONAL Y HUMANO):
+    - PROHIBIDO hablar como una Inteligencia Artificial. PROHIBIDO usar frases como "Algunas de mis aptitudes incluyen:", "En resumen,", o usar lenguaje estructurado y acartonado.
+    - PROHIBIDO usar negritas (**texto**) o formatos markdown de enciclopedia. 
+    - Escribe exactamente como hablaría un humano experimentado en una entrevista real: fluido, natural, persuasivo y yendo directo al grano.
+    - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. 
+    - REGLA DE INFERENCIA: Si te preguntan por fortalezas, debilidades o aptitudes, infiérelas a partir del perfil y de la lista proporcionada. NO uses la palabra "actitudes" por error, céntrate en tus habilidades y competencias reales.
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
@@ -160,7 +160,9 @@ export default function App() {
     PUESTO APLICADO: ${job}
     
     FORMATO DE RESPUESTA REQUERIDO: 
-    ${format === 'bullets' ? 'Viñetas clave cortas (Smart Bullets) con viñetas reales "-", fáciles de leer rápidamente para usar como guía visual (máximo 4-5 viñetas, destacando métricas de éxito).' : 'Párrafos completos tipo teleprompter. Textos fluidos y conversacionales, listos para ser leídos en voz alta sin parecer un robot.'}`;
+    ${format === 'bullets' ? 'Usa separaciones por guiones (-) muy cortas solo para marcar pausas de respiración o ideas clave, pero MANTÉN el tono de guion conversacional hablado, NO hagas un listado de conceptos.' : 'Escribe en un solo bloque de texto fluido o párrafos cortos, como un teleprompter natural.'}
+    
+    PREGUNTA DEL RECLUTADOR:`;
 
     try {
       const response = await fetch('https://api.deepinfra.com/v1/openai/chat/completions', {
