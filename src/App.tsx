@@ -24,19 +24,41 @@ export default function App() {
   // Estado de entrevista
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [answer, setAnswer] = useState('');
-  const [showTimers, setShowTimers] = useState(false);
-  
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(false);
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<number>(0);
+
   // Temporizadores
+  const [timerPhase, setTimerPhase] = useState<'none' | 'prep' | 'record'>('none');
   const [prepTime, setPrepTime] = useState(15);
   const [recordTime, setRecordTime] = useState(60);
-  const [timerPhase, setTimerPhase] = useState<'none' | 'prep' | 'record'>('none');
+  const [showTimers, setShowTimers] = useState(false);
+  
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   const recognitionRef = useRef<any>(null);
   const wakeLockRef = useRef<any>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Lógica de Auto-Scroll
+  useEffect(() => {
+    if (isAutoScrolling && answer) {
+      const scrollStep = () => {
+        if (containerRef.current) {
+          // Incrementa el scroll. 0.5px por frame = ~30px por segundo = ~1 línea por segundo
+          containerRef.current.scrollTop += 0.5;
+        }
+        scrollRef.current = requestAnimationFrame(scrollStep);
+      };
+      scrollRef.current = requestAnimationFrame(scrollStep);
+    }
+
+    return () => {
+      if (scrollRef.current) cancelAnimationFrame(scrollRef.current);
+    };
+  }, [isAutoScrolling, answer]);
 
   // Inicializar Speech Recognition
   useEffect(() => {
@@ -79,10 +101,10 @@ export default function App() {
 
   // Desplazamiento automático al generar texto
   useEffect(() => {
-    if (bottomRef.current && (answer || transcript)) {
+    if (bottomRef.current && !isAutoScrolling) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [answer, transcript]);
+  }, [answer, transcript, isAutoScrolling]);
 
   const requestWakeLock = async () => {
     if ('wakeLock' in navigator) {
@@ -258,7 +280,7 @@ export default function App() {
   // Clean up timers and wake lock on unmount
   useEffect(() => {
     return () => {
-      clearInterval(timerIntervalRef.current!);
+      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       releaseWakeLock();
     };
   }, []);
@@ -346,11 +368,17 @@ export default function App() {
         <button onClick={handleBackToSetup} className="text-xs text-gray-400 px-2 py-1 border border-gray-700 rounded">
           ← Setup
         </button>
+        <button 
+          onClick={() => setIsAutoScrolling(!isAutoScrolling)} 
+          className={`text-xs px-2 py-1 border rounded transition-colors ${isAutoScrolling ? 'text-blue-400 border-blue-400' : 'text-gray-500 border-gray-700'}`}
+        >
+          {isAutoScrolling ? 'Auto-Scroll ON' : 'Auto-Scroll OFF'}
+        </button>
         <div className={`w-3 h-3 rounded-full ${isListening ? 'bg-red-500 animate-pulse' : 'bg-gray-700'}`}></div>
       </div>
 
       {/* Contenedor central ultra-estrecho (Eye-Tracking Seguro) */}
-      <div className="flex-1 w-full max-w-xs sm:max-w-sm flex flex-col justify-start mt-20 px-4 overflow-y-auto pb-40">
+      <div ref={containerRef} className="flex-1 w-full max-w-xs sm:max-w-sm flex flex-col justify-start mt-20 px-4 overflow-y-auto pb-40">
         
         {transcript && (
           <div className="mb-8 text-gray-500 italic text-lg leading-relaxed">
