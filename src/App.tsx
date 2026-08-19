@@ -145,11 +145,13 @@ export default function App() {
     Tu único objetivo es escribir el GUION EXACTO (palabra por palabra) que el candidato leerá en voz alta para responder la pregunta en menos de 60 segundos.
     
     TONO Y ESTILO (ESTRICTAMENTE CONVERSACIONAL Y HUMANO):
-    - PROHIBIDO hablar como una Inteligencia Artificial. PROHIBIDO usar frases como "Algunas de mis aptitudes incluyen:", "En resumen,", o usar lenguaje estructurado y acartonado.
+    - VÉ DIRECTO AL GRANO DESDE LA PRIMERA PALABRA. ESTÁ TOTALMENTE PROHIBIDO usar introducciones de relleno como "En mi experiencia como...", "A lo largo de mi carrera...", o "Me considero una persona...".
+    - ESTÁ TOTALMENTE PROHIBIDO usar conclusiones robóticas como "En resumen,", "En conclusión,", o "Para finalizar".
+    - PROHIBIDO hablar como una Inteligencia Artificial. PROHIBIDO usar frases como "Algunas de mis aptitudes incluyen:" o usar lenguaje estructurado y acartonado.
     - PROHIBIDO usar negritas (**texto**) o formatos markdown de enciclopedia. 
-    - Escribe exactamente como hablaría un humano experimentado en una entrevista real: fluido, natural, persuasivo y yendo directo al grano.
+    - Escribe exactamente como hablaría un humano experimentado en una entrevista real: fluido, natural y persuasivo. Si te preguntan por habilidades, menciónalas como parte de tus logros y experiencia viva.
     - CERO ALUCINACIONES: Basa la respuesta EXCLUSIVAMENTE en el CV, Carta de Presentación y Competencias aportadas. 
-    - REGLA DE INFERENCIA: Si te preguntan por fortalezas, debilidades o aptitudes, infiérelas a partir del perfil y de la lista proporcionada. NO uses la palabra "actitudes" por error, céntrate en tus habilidades y competencias reales.
+    - REGLA DE INFERENCIA DE HABILIDADES: Si te preguntan por fortalezas o aptitudes, menciónalas a partir de la lista. IMPORTANTE: TIENES ESTRICTAMENTE PROHIBIDO USAR LA PALABRA "ACTITUDES". NUNCA digas "actitudes". Usa siempre la palabra "aptitudes", "habilidades" o "competencias".
     - Regla gramatical estricta: Evita cacofonías (reemplaza "y" por "e" ante palabras con sonido "i", y "o" por "u" ante sonido "o").
     
     CV DEL CANDIDATO: 
@@ -160,7 +162,7 @@ export default function App() {
     PUESTO APLICADO: ${job}
     
     FORMATO DE RESPUESTA REQUERIDO: 
-    ${format === 'bullets' ? 'Usa separaciones por guiones (-) muy cortas solo para marcar pausas de respiración o ideas clave, pero MANTÉN el tono de guion conversacional hablado, NO hagas un listado de conceptos.' : 'Escribe en un solo bloque de texto fluido o párrafos cortos, como un teleprompter natural.'}
+    ${format === 'bullets' ? 'Usa separaciones por guiones (-) muy cortas solo para marcar pausas de respiración, pero MANTÉN el tono de guion conversacional hablado. NO hagas introducciones ni conclusiones, ve directo a los puntos.' : 'Escribe en un solo bloque de texto fluido o párrafos cortos. NO hagas introducciones ni conclusiones, empieza a responder directamente la esencia de la pregunta.'}
     
     PREGUNTA DEL RECLUTADOR:`;
 
