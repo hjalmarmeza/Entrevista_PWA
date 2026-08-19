@@ -29,7 +29,6 @@ export default function App() {
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<number>(0);
   const exactScrollRef = useRef<number>(0);
   const finalTranscriptRef = useRef<string>('');
 
@@ -45,27 +44,26 @@ export default function App() {
 
   // Lógica de Auto-Scroll
   useEffect(() => {
-    if ((isAutoScrolling || timerPhase === 'record') && answer) {
-      // Sincronizar el scroll exacto con la posición actual (por si el usuario movió el dedo)
+    if (isAutoScrolling || timerPhase === 'record') {
+      // Sincronizar el scroll inicial
       if (containerRef.current) {
         exactScrollRef.current = containerRef.current.scrollTop;
       }
 
-      const scrollStep = () => {
+      const intervalId = setInterval(() => {
         if (containerRef.current) {
-          // Usamos una variable separada porque scrollTop trunca los decimales a 0 en muchos navegadores
-          exactScrollRef.current += 0.5;
+          // Si el usuario scrolleó manualmente con el dedo, la distancia será mayor a 2px. Sincronizamos.
+          if (Math.abs(containerRef.current.scrollTop - exactScrollRef.current) > 2) {
+            exactScrollRef.current = containerRef.current.scrollTop;
+          }
+          exactScrollRef.current += 0.5; // ~30px por segundo
           containerRef.current.scrollTop = exactScrollRef.current;
         }
-        scrollRef.current = requestAnimationFrame(scrollStep);
-      };
-      scrollRef.current = requestAnimationFrame(scrollStep);
-    }
+      }, 16); // ~60fps
 
-    return () => {
-      if (scrollRef.current) cancelAnimationFrame(scrollRef.current);
-    };
-  }, [isAutoScrolling, timerPhase, answer]);
+      return () => clearInterval(intervalId);
+    }
+  }, [isAutoScrolling, timerPhase]);
 
   // Inicializar Speech Recognition
   useEffect(() => {
