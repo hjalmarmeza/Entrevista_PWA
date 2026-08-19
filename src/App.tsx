@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import mammoth from 'mammoth';
 import { defaultCV, defaultCoverLetter, defaultAptitudes } from './defaults';
 
 // Tipos para Web Speech API
@@ -16,12 +15,11 @@ export default function App() {
   const [isConfigured, setIsConfigured] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('hp_apiKey') || '');
   const [model, setModel] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
-  const [cv, setCv] = useState(localStorage.getItem('hp_cv') || defaultCV);
-  const [coverLetter, setCoverLetter] = useState(localStorage.getItem('hp_coverLetter') || defaultCoverLetter);
-  const [aptitudes, setAptitudes] = useState(localStorage.getItem('hp_aptitudes') || defaultAptitudes);
+  const [cv] = useState(localStorage.getItem('hp_cv') || defaultCV);
+  const [coverLetter] = useState(localStorage.getItem('hp_coverLetter') || defaultCoverLetter);
+  const [aptitudes] = useState(localStorage.getItem('hp_aptitudes') || defaultAptitudes);
   const [job, setJob] = useState(localStorage.getItem('hp_job') || '');
   const [format, setFormat] = useState<Format>((localStorage.getItem('hp_format') as Format) || 'bullets');
-  const [isUploading, setIsUploading] = useState(false);
 
   // Estado de entrevista
   const [isListening, setIsListening] = useState(false);
@@ -100,70 +98,6 @@ export default function App() {
     if (wakeLockRef.current) {
       wakeLockRef.current.release();
       wakeLockRef.current = null;
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, target: 'cv' | 'coverLetter' | 'aptitudes') => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setIsUploading(true);
-
-    try {
-      let text = '';
-      if (file.type === 'application/pdf') {
-        // Cargar dinámicamente PDF.js puro desde CDN para evitar errores de Rollup/Vite en Safari
-        if (!(window as any).pdfjsLib) {
-          await new Promise<void>((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('No se pudo cargar PDF.js'));
-            document.head.appendChild(script);
-          });
-          const pdfjsLib = (window as any).pdfjsLib;
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        }
-
-        const pdfjsLib = (window as any).pdfjsLib;
-        const arrayBuffer = await file.arrayBuffer();
-        const data = new Uint8Array(arrayBuffer);
-        const loadingTask = pdfjsLib.getDocument({ data });
-        const pdf = await loadingTask.promise;
-        const totalPages = pdf.numPages || 0;
-        
-        for (let i = 1; i <= totalPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          if (content && content.items) {
-            const itemsLength = content.items.length || 0;
-            for (let j = 0; j < itemsLength; j++) {
-              const item = content.items[j];
-              if (item && typeof item.str === 'string') {
-                text += item.str + ' ';
-              }
-            }
-            text += '\\n';
-          }
-        }
-      } else if (file.name.endsWith('.docx')) {
-        const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        text = result.value;
-      } else {
-        // Fallback for txt or other readable files
-        text = await file.text();
-      }
-
-      if (target === 'cv') setCv(text);
-      else if (target === 'coverLetter') setCoverLetter(text);
-      else setAptitudes(text);
-    } catch (err) {
-      console.error('Error al procesar el archivo', err);
-      alert('Hubo un error al extraer el texto del archivo.');
-    } finally {
-      setIsUploading(false);
-      // Resetear el input file para que permita seleccionar el mismo de nuevo si se requiere
-      event.target.value = '';
     }
   };
 
@@ -354,60 +288,12 @@ export default function App() {
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-gray-400">Tu CV / Experiencia</label>
-                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
-                  {isUploading ? 'Procesando...' : 'Subir archivo (PDF/Docx)'}
-                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'cv')} disabled={isUploading} />
-                </label>
-              </div>
-              <textarea 
-                value={cv}
-                onChange={e => setCv(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-32 resize-none"
-                placeholder="Pega tu CV aquí o sube un archivo..."
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-gray-400">Carta de Presentación (Opcional)</label>
-                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
-                  {isUploading ? 'Procesando...' : 'Subir archivo'}
-                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'coverLetter')} disabled={isUploading} />
-                </label>
-              </div>
-              <textarea 
-                value={coverLetter}
-                onChange={e => setCoverLetter(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
-                placeholder="Pega tu carta de presentación..."
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-gray-400">Aptitudes y Competencias (Opcional)</label>
-                <label className="text-xs text-blue-400 cursor-pointer hover:text-blue-300">
-                  {isUploading ? 'Procesando...' : 'Subir archivo'}
-                  <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileUpload(e, 'aptitudes')} disabled={isUploading} />
-                </label>
-              </div>
-              <textarea 
-                value={aptitudes}
-                onChange={e => setAptitudes(e.target.value)}
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
-                placeholder="Pega tu lista de aptitudes y competencias clave..."
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-400 mb-1">Descripción del Puesto</label>
               <textarea 
                 value={job}
                 onChange={e => setJob(e.target.value)}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
-                placeholder="¿A qué puesto aplicas?"
+                placeholder="Pega la oferta de trabajo aquí..."
               />
             </div>
 
