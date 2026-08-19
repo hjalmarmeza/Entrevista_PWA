@@ -29,7 +29,6 @@ export default function App() {
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const exactScrollRef = useRef<number>(0);
   const finalTranscriptRef = useRef<string>('');
 
   // Temporizadores
@@ -45,21 +44,15 @@ export default function App() {
   // Lógica de Auto-Scroll
   useEffect(() => {
     if (isAutoScrolling || timerPhase === 'record') {
-      // Sincronizar el scroll inicial
-      if (containerRef.current) {
-        exactScrollRef.current = containerRef.current.scrollTop;
-      }
-
       const intervalId = setInterval(() => {
+        // scrollBy es relativo. Si el usuario hace scroll con el dedo, simplemente se suma 1px 
+        // a la nueva posición sin "pelear" contra él.
+        // Hacemos scroll tanto en la ventana global como en el contenedor (por si alguno de los dos tiene el overflow)
+        window.scrollBy(0, 1);
         if (containerRef.current) {
-          // Si el usuario scrolleó manualmente con el dedo, la distancia será mayor a 2px. Sincronizamos.
-          if (Math.abs(containerRef.current.scrollTop - exactScrollRef.current) > 2) {
-            exactScrollRef.current = containerRef.current.scrollTop;
-          }
-          exactScrollRef.current += 0.5; // ~30px por segundo
-          containerRef.current.scrollTop = exactScrollRef.current;
+          containerRef.current.scrollBy(0, 1);
         }
-      }, 16); // ~60fps
+      }, 30); // 1px cada 30ms = ~33px por segundo (velocidad cómoda de lectura)
 
       return () => clearInterval(intervalId);
     }
