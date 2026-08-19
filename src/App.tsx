@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import mammoth from 'mammoth';
+import { defaultCV, defaultCoverLetter, defaultAptitudes } from './defaults';
 
 // Tipos para Web Speech API
 declare global {
@@ -15,9 +16,9 @@ export default function App() {
   const [isConfigured, setIsConfigured] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('hp_apiKey') || '');
   const [model, setModel] = useState(localStorage.getItem('hp_model') || 'meta-llama/Meta-Llama-3-70B-Instruct');
-  const [cv, setCv] = useState(localStorage.getItem('hp_cv') || '');
-  const [coverLetter, setCoverLetter] = useState(localStorage.getItem('hp_coverLetter') || '');
-  const [aptitudes, setAptitudes] = useState(localStorage.getItem('hp_aptitudes') || '');
+  const [cv, setCv] = useState(localStorage.getItem('hp_cv') || defaultCV);
+  const [coverLetter, setCoverLetter] = useState(localStorage.getItem('hp_coverLetter') || defaultCoverLetter);
+  const [aptitudes, setAptitudes] = useState(localStorage.getItem('hp_aptitudes') || defaultAptitudes);
   const [job, setJob] = useState(localStorage.getItem('hp_job') || '');
   const [format, setFormat] = useState<Format>((localStorage.getItem('hp_format') as Format) || 'bullets');
   const [isUploading, setIsUploading] = useState(false);
