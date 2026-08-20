@@ -33,7 +33,6 @@ export default function App() {
 
   // Temporizadores
   const [timerPhase, setTimerPhase] = useState<'none' | 'prep' | 'record'>('none');
-  const [prepTime, setPrepTime] = useState(15);
   const [recordTime, setRecordTime] = useState(60);
   const [showTimers, setShowTimers] = useState(false);
   
@@ -135,7 +134,8 @@ export default function App() {
     setAnswer('');
     finalTranscriptRef.current = '';
     clearInterval(timerIntervalRef.current!);
-    startTimers(); // EL USUARIO MANDÓ QUE EMPIECE EXACTAMENTE AL PRESIONAR EL BOTÓN
+    setShowTimers(false);
+    setTimerPhase('none');
     if (recognitionRef.current) {
       recognitionRef.current.start();
       setIsListening(true);
@@ -157,6 +157,20 @@ export default function App() {
       containerRef.current.scrollTop = 0;
     }
     
+    // Iniciar temporizador de grabación al momento de generar la respuesta
+    setShowTimers(true);
+    setRecordTime(60);
+    setTimerPhase('record');
+    clearInterval(timerIntervalRef.current!);
+    timerIntervalRef.current = setInterval(() => {
+      setRecordTime(prev => {
+        if (prev > 1) return prev - 1;
+        clearInterval(timerIntervalRef.current!);
+        setTimerPhase('none');
+        return 0;
+      });
+    }, 1000);
+    
     
     const systemPrompt = `Actúa como el candidato en una entrevista de trabajo. Eres un profesional experimentado.
     Tu único objetivo es escribir el GUION EXACTO (palabra por palabra) que el candidato leerá en voz alta para responder la pregunta en menos de 60 segundos.
@@ -165,6 +179,7 @@ export default function App() {
     - Estás aplicando a este puesto específico: ${job}
     - FILTRA TU CV: NO recites tu perfil completo. Selecciona ÚNICAMENTE las habilidades y experiencias que tengan sentido para ESTE puesto. 
     - ADAPTA EL LENGUAJE: Si vienes de un sector técnico (ej. Telecomunicaciones, IA) y aplicas a algo distinto (ej. Encargado de Supermercado), TRADUCE tu experiencia. Habla de liderazgo de equipos, manejo de operaciones, atención al cliente y resolución de problemas. OMITE por completo la jerga técnica (como "ecosistemas cloud", "APIs", "LLMs", "No-Code") a menos que el puesto lo requiera explícitamente.
+    - PROHIBIDO DECIR QUE VIENES A "APRENDER": Nunca digas que vienes a aprender del sector retail. Tu postura debe ser que ya eres un experto en gestión de operaciones, KPIs y liderazgo, y vienes a aplicar esa disciplina de alto nivel en sus tiendas.
     
     CONTEXTO DE LA EMPRESA (LUPA SUPERMERCADOS):
     - Grupo: Semark AC Group S.A.
@@ -280,36 +295,6 @@ export default function App() {
       setIsProcessing(false);
     }
   };
-
-  function startTimers() {
-    setShowTimers(true);
-    setPrepTime(15);
-    setRecordTime(60);
-    setTimerPhase('prep');
-
-    timerIntervalRef.current = setInterval(() => {
-      setPrepTime(prev => {
-        if (prev > 1) return prev - 1;
-        // Termina prep, pasa a record
-        setTimerPhase('record');
-        return 0;
-      });
-    }, 1000);
-  };
-
-  useEffect(() => {
-    if (timerPhase === 'record') {
-      clearInterval(timerIntervalRef.current!);
-      timerIntervalRef.current = setInterval(() => {
-        setRecordTime(prev => {
-          if (prev > 1) return prev - 1;
-          clearInterval(timerIntervalRef.current!);
-          setTimerPhase('none');
-          return 0;
-        });
-      }, 1000);
-    }
-  }, [timerPhase]);
 
   // Clean up timers and wake lock on unmount
   useEffect(() => {
@@ -436,31 +421,17 @@ export default function App() {
       {/* Controles y Temporizadores fijos abajo */}
       <div className="fixed bottom-0 left-0 right-0 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] bg-gradient-to-t from-black via-black to-transparent flex flex-col items-center">
         
-        {showTimers && timerPhase !== 'none' && (
+        {showTimers && timerPhase === 'record' && (
           <div className="w-full max-w-xs mb-6 space-y-2">
-            {timerPhase === 'prep' && (
-              <div>
-                <div className="flex justify-between text-xs text-blue-400 mb-1 font-bold">
-                  <span>PREPARACIÓN</span>
-                  <span>{prepTime}s</span>
-                </div>
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 transition-all duration-1000 ease-linear" style={{ width: `${(prepTime / 15) * 100}%` }}></div>
-                </div>
+            <div>
+              <div className={`flex justify-between text-xs mb-1 font-bold ${recordTime <= 15 ? (recordTime <= 5 ? 'text-red-500 animate-pulse' : 'text-yellow-500') : 'text-green-500'}`}>
+                <span>TIEMPO PARA LEER</span>
+                <span>{recordTime}s</span>
               </div>
-            )}
-            
-            {timerPhase === 'record' && (
-              <div>
-                <div className={`flex justify-between text-xs mb-1 font-bold ${recordTime <= 15 ? (recordTime <= 5 ? 'text-red-500 animate-pulse' : 'text-yellow-500') : 'text-green-500'}`}>
-                  <span>GRABACIÓN</span>
-                  <span>{recordTime}s</span>
-                </div>
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 ease-linear ${recordTime <= 15 ? (recordTime <= 5 ? 'bg-red-500' : 'bg-yellow-500') : 'bg-green-500'}`} style={{ width: `${(recordTime / 60) * 100}%` }}></div>
-                </div>
+              <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div className={`h-full transition-all duration-1000 ease-linear ${recordTime <= 15 ? (recordTime <= 5 ? 'bg-red-500' : 'bg-yellow-500') : 'bg-green-500'}`} style={{ width: `${(recordTime / 60) * 100}%` }}></div>
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -483,7 +454,7 @@ export default function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
             </svg>
-            <span>Detener y Responder</span>
+            <span>ENTIENDO - RESPONDER AHORA</span>
           </button>
         )}
       </div>
